@@ -1,89 +1,232 @@
-# 📱 React Native Enterprise Network Architecture (2026 Reference)
 
-Production-grade React Native reference architecture built with:
+```md
+# 📱 React Native Enterprise Network Architecture (Production Hardened - 2026)
 
-- Redux Toolkit
-- TanStack Query
-- Circuit Breaker
-- Rate Limiter
-- Offline Mutation Queue
-- Background Sync
-- Correlation IDs
-- Performance Tracking
-- Secure Storage
-- Certificate Pinning Capability
-- Full Jest + MSW Test Setup
+A **100% enterprise-grade, production-hardened React Native networking architecture** designed for:
 
-This is a **production-ready enterprise starter template**.
+- 🔐 Secure API communication
+- 📡 Resilient request orchestration
+- 📴 Offline-first architecture
+- ⚡ High-performance rendering
+- 🧠 Clean separation of client/server state
+- 🏗 Scalable enterprise structure
+- 🧪 Test-ready (Jest + MSW boundary ready)
 
----
+This repository is suitable as:
 
-# 🚀 Project Purpose
-
-This project demonstrates:
-
-- Enterprise-grade networking
-- Offline-first architecture
-- Secure API handling
-- Resilient request strategy
-- Performance-optimized data fetching
-- Proper state separation (Redux + TanStack Query)
-
-Designed for:
-
-- Production apps
-- Senior-level interviews
-- Architecture discussions
-- Scalable React Native systems
+- ✅ Production starter template
+- ✅ Senior-level portfolio project
+- ✅ Enterprise architecture reference
+- ✅ Interview-ready networking blueprint
 
 ---
 
-# 🏗 Architecture Overview
+# 🎯 Architecture Philosophy
 
-## State Strategy
+This project follows **strict separation of concerns**:
+
+UI
+↓
+Custom Hook (TanStack Query)
+↓
+Service Layer
+↓
+Request Orchestrator
+↓
+Token Refresh Guard
+↓
+Rate Limiter
+↓
+Circuit Breaker (Closed → Open → Half-Open)
+↓
+Error Normalizer
+↓
+Transport Layer (Axios / SSL Pinning)
+↓
+API
 
 | Layer | Responsibility |
-|-------|---------------|
-| Redux Toolkit | Client state (auth, flags, UI state) |
-| TanStack Query | Server state (API caching & synchronization) |
+|--------|----------------|
+| UI Layer | Rendering only (no API logic) |
+| Hooks Layer | Server state handling |
+| Service Layer | Business logic & API abstraction |
+| Orchestrator | Request coordination |
+| Transport Layer | Network communication |
+| Core Utilities | Security, monitoring, resilience |
 
-Redux is NOT used for server data.
+No cross-layer leakage.
 
 ---
 
-# 📂 Folder Structure
+# 🏗 High-Level Request Flow
 
+```
+
+UI
+↓
+Custom Hook (TanStack Query)
+↓
+Service Layer
+↓
+Request Orchestrator
+↓
+Token Refresh Guard
+↓
+Rate Limiter
+↓
+Circuit Breaker (Closed → Open → Half-Open)
+↓
+Error Normalizer
+↓
+Transport Layer (Axios / SSL Pinning)
+↓
+API
+
+```
+
+---
+
+# ✅ Included Enterprise Features
+
+- ✅ Redux Toolkit (Client State)
+- ✅ TanStack Query (Server State)
+- ✅ Circuit Breaker (Half-Open Supported)
+- ✅ Client-Side Rate Limiter
+- ✅ Persistent Offline Mutation Queue (MMKV)
+- ✅ Background Sync Worker
+- ✅ Token Refresh Locking Mechanism
+- ✅ Correlation IDs
+- ✅ Structured Logging Adapter
+- ✅ Performance Tracking Layer
+- ✅ Error Normalization Layer
+- ✅ Environment Configuration Layer
+- ✅ Secure Storage (MMKV)
+- ✅ SSL Pinning Integration Point
+- ✅ AbortController Cancellation Support
+- ✅ FlashList (High-performance rendering)
+- ✅ Jest Test Setup (MSW-ready boundary)
+
+---
+
+# 🔐 Security Architecture
+
+This architecture protects against:
+
+- Token replay storms
+- Burst traffic flooding
+- API cascade failures
+- Offline data loss
+- MITM attacks (SSL pinning supported)
+- Correlation tracing failures
+- Error structure inconsistencies
+
+---
+
+# 🔒 SSL Pinning Integration
+
+SSL pinning must be integrated at the **transport layer only**.
+
+File:
+
+```
+
+src/core/api/axiosClient.ts
+
+```
+
+If `ENABLE_SSL_PINNING` is enabled in:
+
+```
+
+src/config/env.ts
+
+````
+
+Replace axios transport with:
+
+```ts
+import { fetch } from 'react-native-ssl-pinning';
+````
+
+⚠ Never integrate SSL logic into services or business layers.
+
+---
+
+# 🧠 State Management Strategy
+
+## Redux Toolkit → Client State Only
+
+Used for:
+
+* Authentication state
+* UI flags
+* Local preferences
+
+Not used for:
+
+* API responses
+* Server caching
+
+---
+
+## TanStack Query → Server State
+
+Handles:
+
+* Caching
+* Refetching
+* Deduplication
+* Background refresh
+* Retry logic
+* Stale management
+
+This eliminates misuse of Redux for server data.
+
+---
+
+# 🧱 Folder Structure
+
+```
 src/
 │
 ├── app/
 │   ├── store.ts
-│   └── rootReducer.ts
+│   └── queryClient.ts
+│
+├── config/
+│   └── env.ts
 │
 ├── features/
-│   └── auth/
-│       ├── authSlice.ts
+│   ├── auth/
+│   │   └── authSlice.ts
+│   └── users/
+│       └── useUsers.ts
 │
-├── network/
-│   ├── apiClient.ts
-│   ├── interceptors.ts
-│   ├── circuitBreaker.ts
-│   ├── rateLimiter.ts
-│   ├── correlation.ts
-│   ├── performanceTracker.ts
-│   ├── offlineQueue.ts
-│   └── secureStorage.ts
+├── core/
+│   ├── api/
+│   │   ├── axiosClient.ts
+│   │   ├── circuitBreaker.ts
+│   │   ├── rateLimiter.ts
+│   │   ├── requestOrchestrator.ts
+│   │   └── errorNormalizer.ts
+│   │
+│   ├── auth/
+│   │   └── tokenManager.ts
+│   │
+│   ├── security/
+│   │   └── secureStorage.ts
+│   │
+│   ├── offline/
+│   │   └── mutationQueue.ts
+│   │
+│   ├── background/
+│   │   └── backgroundSync.ts
+│   │
+│   └── monitoring/
+│       └── logger.ts
 │
 ├── services/
-│   ├── authService.ts
-│   ├── userService.ts
-│   └── postService.ts
-│
-├── hooks/
-│   ├── useUsers.ts
-│   ├── useCreatePost.ts
-│
-├── workers/
-│   └── backgroundSync.ts
+│   └── userService.ts
 │
 ├── screens/
 │   └── HomeScreen.tsx
@@ -92,237 +235,242 @@ src/
     ├── api.test.ts
     ├── circuitBreaker.test.ts
     └── offlineQueue.test.ts
+```
 
 ---
 
-# ⚙️ How To Run This Project
+# ⚙️ How To Run The Project
 
-Follow these exact steps:
+## 1️⃣ Prerequisites
 
----
-
-## ✅ 1️⃣ Prerequisites
-
-Make sure you have:
-
-- Node.js >= 18
-- npm or yarn
-- React Native CLI
-- Android Studio (for Android)
-- Xcode (for iOS - Mac only)
-- CocoaPods (for iOS)
+* Node.js >= 18
+* npm >= 9
+* React Native CLI
+* Android Studio
+* Xcode (Mac only)
+* CocoaPods (Mac only)
 
 Check versions:
 
+```
 node -v
 npm -v
+```
 
 ---
 
-## ✅ 2️⃣ Clone Repository
+## 2️⃣ Clone Repository
 
-git clone <your-repository-url>
+```
+git clone <your-repo-url>
 cd react-native-enterprise-network
+```
 
 ---
 
-## ✅ 3️⃣ Install Dependencies
+## 3️⃣ Install Dependencies
 
+```
 npm install
-
-OR
-
-yarn install
+```
 
 ---
 
-## ✅ 4️⃣ iOS Setup (Mac Only)
+## 4️⃣ iOS Setup (Mac Only)
 
+```
 cd ios
 pod install
 cd ..
+```
 
 ---
 
-## ✅ 5️⃣ Start Metro Bundler
+## 5️⃣ Start Metro
 
+```
 npm start
-
-Keep this running in one terminal.
+```
 
 ---
 
-## ✅ 6️⃣ Run Android
+## 6️⃣ Run Android
 
-In a new terminal:
-
+```
 npm run android
+```
 
-Make sure:
+Ensure:
 
-- Android Emulator is running
-OR
-- Physical device connected with USB debugging enabled
+* Emulator running OR
+* Physical device connected with USB debugging enabled
 
 ---
 
-## ✅ 7️⃣ Run iOS (Mac Only)
+## 7️⃣ Run iOS (Mac Only)
 
+```
 npm run ios
+```
 
 ---
 
-# 🌐 API Configuration
+# 🌐 Environment Configuration
 
-The project uses:
+File:
 
-https://jsonplaceholder.typicode.com
+```
+src/config/env.ts
+```
 
-To change API base URL:
+Environments supported:
 
-Open:
+* development
+* staging
+* production
 
-src/network/apiClient.ts
+Modify BASE_URL and SSL flag here.
 
-Update:
-
-baseURL: 'https://your-api-url.com'
-
----
-
-# 🔄 How To Test Offline Queue
-
-1. Run the app
-2. Turn off internet (Airplane mode)
-3. Trigger a mutation (e.g., create post)
-4. Turn internet back on
-5. Observe automatic replay
+No hardcoded URLs inside transport layer.
 
 ---
 
-# 🧪 Running Tests
+# 🧪 Testing
 
-Run all tests:
+Run tests:
 
+```
 npm run test
+```
 
 Watch mode:
 
+```
 npm run test:watch
+```
 
-Generate coverage:
+Coverage:
 
+```
 npm run test:coverage
+```
 
-Expected coverage target: 90%+
+Target:
 
----
+```
+> 90% coverage
+```
 
-# 🔐 Security Features
-
-✔ Secure token storage  
-✔ JWT auto injection  
-✔ Token refresh handling  
-✔ Certificate pinning capability  
-✔ Correlation IDs  
-✔ Controlled retry mechanism  
-✔ Rate limiting  
-✔ Circuit breaker  
-
-To enable SSL pinning:
-
-npm install react-native-ssl-pinning
-
-Integrate adapter inside apiClient.ts.
+MSW-ready boundary is implemented.
+Add `msw` server in `setupTests.ts` for full API mocking.
 
 ---
 
-# 🔥 Resilience Features
+# 📴 Offline Architecture
 
-### Circuit Breaker
+* Mutations persist to MMKV
+* Survive crash & restart
+* Replay automatically on reconnect
+* Background network listener enabled
 
-- Opens after repeated failures
-- Blocks requests temporarily
-- Auto-recovers after cooldown
+Test manually:
 
-### Rate Limiter
-
-- Prevents retry storms
-- Prevents API abuse
+1. Disable internet
+2. Trigger mutation
+3. Re-enable internet
+4. Observe replay
 
 ---
 
-# 🔄 Offline Architecture
+# ⚡ Performance Optimizations
+
+* FlashList for optimized rendering
+* Rate limiter prevents flooding
+* Circuit breaker prevents cascade failures
+* Exponential retry backoff
+* Request cancellation support
+* Correlation ID tracing
+* Structured logging
+* Performance timing capture
+
+---
+
+# 📊 Observability
 
 Includes:
 
-- Persistent offline mutation queue
-- Ordered replay
-- Background sync worker
-- Network reconnect handling
+* Structured logger
+* API duration tracking
+* Circuit breaker state visibility
+* Error normalization
 
----
+Can integrate with:
 
-# 📊 Performance Optimizations
-
-- Proper staleTime and cacheTime
-- Request deduplication
-- Memoization-ready UI
-- Background refetch
-- Slow API tracking
-- AbortController support
-
----
-
-# 🧠 Interview Evaluation Guide
-
-If reviewing this project:
-
-1. Inspect network layer
-2. Review circuitBreaker.ts
-3. Review rateLimiter.ts
-4. Check offlineQueue.ts
-5. Run tests
-6. Simulate offline mode
-7. Inspect background sync behavior
+* Sentry
+* Datadog
+* NewRelic
+* Firebase Crashlytics
 
 ---
 
 # 🏆 Production Readiness Status
 
-| Category | Status |
-|----------|--------|
-| Performance | ✅ |
-| Security | ✅ |
-| Offline Support | ✅ |
-| Scalability | ✅ |
-| Testability | ✅ |
-| Microservice Ready | ✅ |
+| Category            | Status |
+| ------------------- | ------ |
+| Security            | ✅      |
+| Resilience          | ✅      |
+| Offline Support     | ✅      |
+| Performance         | ✅      |
+| Observability       | ✅      |
+| Scalability         | ✅      |
+| Enterprise Patterns | ✅      |
+| Interview Ready     | ✅      |
 
 ---
 
-# 📌 Future Enhancements
+# 🚀 Future Enhancements
 
-- Sentry APM integration
-- Datadog tracing
-- Detox E2E testing
-- GraphQL gateway support
-- Chaos testing
+* WebSocket resilience layer
+* GraphQL gateway integration
+* Chaos testing suite
+* Detox E2E automation
+* Advanced APM hooks
+* Distributed tracing propagation
+
+---
+
+# 📜 License
+
+MIT License
+
+Copyright (c) 2026
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction...
+
+(You may include full MIT license text here.)
 
 ---
 
 # 👨‍💻 Final Note
 
-This project is built to demonstrate:
+This repository demonstrates:
 
-- Enterprise-level network architecture
-- 2026 best practices
-- Production-ready React Native design
-- Clean separation of client & server state
+* Enterprise networking patterns
+* Production-hardened mobile architecture
+* Secure API handling
+* Offline-first strategy
+* Fault-tolerant request orchestration
+* Proper state separation
+* Clean architecture enforcement
 
-It can be used as:
+This is not a demo-level setup.
+This is a **real-world scalable mobile foundation**.
 
-- A real production starter
-- A portfolio reference
-- A senior-level interview discussion base
-- A scalable architecture template
+---
+
+**Built for engineers who care about architecture.**
+
+```
+
